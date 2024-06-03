@@ -115,6 +115,9 @@ static const scwrap_t syscallwrap[] = {
     //[25] = {__NR_mremap, 5},    // wrapped to track protection
     [27] = {__NR_mincore, 3},
     [28] = {__NR_madvise, 3},
+    #ifdef __NR_dup
+    [32] = {__NR_dup, 1},
+    #endif
     #ifdef __NR_dup2
     [33] = {__NR_dup2, 2},
     #endif
@@ -549,6 +552,13 @@ void EXPORT x64Syscall(x64emu_t *emu)
         case 25: // sys_mremap
             R_RAX = (uintptr_t)my_mremap(emu, (void*)R_RDI, R_RSI, R_RDX, R_R10d, (void*)R_R8);
             break;
+        #ifndef __NR_dup
+        case 32: // sys_dup
+            S_RAX = dup(S_EDI);
+            if(S_RAX==-1)
+                S_RAX = -errno;
+            break;
+	#endif
         #ifndef __NR_dup2
         case 33: // sys_dup2
             S_RAX = dup2(S_EDI, S_ESI);
@@ -959,6 +969,10 @@ long EXPORT my_syscall(x64emu_t *emu)
                 return syscall(__NR_clone, R_RSI, R_RDX, R_RCX, R_R9, R_R8);    // invert R_R8/R_R9 on Aarch64 and most other
                 #endif
             break;
+        #ifndef __NR_dup
+        case 32:
+            return  dup(S_ESI);
+        #endif
         #ifndef __NR_dup2
         case 33:
             return  dup2(S_ESI, S_EDX);

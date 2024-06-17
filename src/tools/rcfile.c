@@ -99,7 +99,9 @@ ENTRYBOOL(BOX64_CRASHHANDLER, box64_dummy_crashhandler) \
 ENTRYBOOL(BOX64_NOPULSE, box64_nopulse)                 \
 ENTRYBOOL(BOX64_NOGTK, box64_nogtk)                     \
 ENTRYBOOL(BOX64_NOVULKAN, box64_novulkan)               \
+ENTRYBOOL(BOX64_RDTSC_1GHZ, box64_rdtsc_1ghz)           \
 ENTRYBOOL(BOX64_SSE42, box64_sse42)                     \
+ENTRYINT(BOX64_AVX, new_avx, 0, 2, 2)                   \
 ENTRYBOOL(BOX64_FUTEX_WAITV, box64_futex_waitv)         \
 ENTRYSTRING_(BOX64_BASH, bash)                          \
 ENTRYINT(BOX64_JITGDB, jit_gdb, 0, 3, 2)                \
@@ -488,6 +490,7 @@ extern char* ftrace_name;
 void openFTrace(const char* newtrace);
 void addNewEnvVar(const char* s);
 void AddNewLibs(const char* libs);
+void computeRDTSC();
 #ifdef DYNAREC
 void GatherDynarecExtensions();
 #endif
@@ -506,6 +509,7 @@ void ApplyParams(const char* name)
         return;
     int new_cycle_log = cycle_log;
     int new_maxcpu = box64_maxcpu;
+    int new_avx = box64_avx2?2:box64_avx;
     int box64_dynarec_jvm = box64_jvm;
     if(!strcmp(name, old_name)) {
         return;
@@ -554,6 +558,20 @@ void ApplyParams(const char* name)
         cycle_log = new_cycle_log;
         initCycleLog(my_context);
     }
+    if(param->is_new_avx_present) {
+        if(!new_avx) {
+            printf_log(LOG_INFO, "Hidding AVX extension");
+            box64_avx = 0; box64_avx2 = 0;
+        } else if(new_avx==1) {
+            printf_log(LOG_INFO, "Exposing AVX extension");
+            box64_avx = 1; box64_avx2 = 0;
+        } else if(new_avx==2) {
+            printf_log(LOG_INFO, "Exposing AVX/AVX2 extensions");
+            box64_avx = 1; box64_avx2 = 1;
+        }
+    }
+    if(param->is_box64_rdtsc_1ghz_present)
+        computeRDTSC();
     #ifdef DYNAREC
     if(param->is_box64_dynarec_jvm_present && !param->is_box64_jvm_present)
         box64_jvm = box64_dynarec_jvm;

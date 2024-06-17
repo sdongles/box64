@@ -313,6 +313,7 @@ set(ELFLOADER_SRC
     "${BOX64_ROOT}/src/box64context.c"
     "${BOX64_ROOT}/src/build_info.c"
     "${BOX64_ROOT}/src/custommem.c"
+    "${BOX64_ROOT}/src/custommmap.c"
     "${BOX64_ROOT}/src/dynarec/dynarec.c"
     "${BOX64_ROOT}/src/elfs/elfloader.c"
     "${BOX64_ROOT}/src/elfs/elfparser.c"
@@ -379,6 +380,7 @@ set(INTERPRETER
     "${BOX64_ROOT}/src/emu/x64run66dd.c"
     "${BOX64_ROOT}/src/emu/x64run66f0.c"
     "${BOX64_ROOT}/src/emu/x64run67.c"
+    "${BOX64_ROOT}/src/emu/x64run67avx.c"
     "${BOX64_ROOT}/src/emu/x64run67_32.c"
     "${BOX64_ROOT}/src/emu/x64run6764_32.c"
     "${BOX64_ROOT}/src/emu/x64run670f.c"
@@ -395,6 +397,18 @@ set(INTERPRETER
     "${BOX64_ROOT}/src/emu/x64runf0.c"
     "${BOX64_ROOT}/src/emu/x64runf20f.c"
     "${BOX64_ROOT}/src/emu/x64runf30f.c"
+    "${BOX64_ROOT}/src/emu/x64runavx.c"
+    "${BOX64_ROOT}/src/emu/x64runavx0f.c"
+    "${BOX64_ROOT}/src/emu/x64runavx0f38.c"
+    "${BOX64_ROOT}/src/emu/x64runavx660f.c"
+    "${BOX64_ROOT}/src/emu/x64runavxf20f.c"
+    "${BOX64_ROOT}/src/emu/x64runavxf30f.c"
+    "${BOX64_ROOT}/src/emu/x64runavx660f38.c"
+    "${BOX64_ROOT}/src/emu/x64runavx660f3a.c"
+    "${BOX64_ROOT}/src/emu/x64runavxf20f38.c"
+    "${BOX64_ROOT}/src/emu/x64runavxf30f38.c"
+    "${BOX64_ROOT}/src/emu/x64runavxf20f3a.c"
+    "${BOX64_ROOT}/src/emu/x64runavxf30f3a.c"
 )
 
 if(STATICBUILD)
@@ -639,6 +653,13 @@ set(WRAPPEDS
     "${BOX64_ROOT}/src/wrapped/wrappedicui18n74.c"
     "${BOX64_ROOT}/src/wrapped/wrappedidn2.c"
     "${BOX64_ROOT}/src/wrapped/wrappedanl.c"
+    "${BOX64_ROOT}/src/wrapped/wrappedpsl5.c"
+    "${BOX64_ROOT}/src/wrapped/wrappedlibssh2.c"
+    "${BOX64_ROOT}/src/wrapped/wrappedp11kit.c"
+    "${BOX64_ROOT}/src/wrapped/wrappedlibtasn1.c"
+    "${BOX64_ROOT}/src/wrapped/wrappedlibnettle8.c"
+    "${BOX64_ROOT}/src/wrapped/wrappedlibunistring2.c"
+    "${BOX64_ROOT}/src/wrapped/wrappedlibhogweed6.c"
 )
 endif()
 if(ANDROID)
@@ -728,6 +749,7 @@ if(ARM_DYNAREC)
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_66.c"
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_67.c"
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_67_32.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_67_avx.c"
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_6764_32.c"
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_d8.c"
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_d9.c"
@@ -745,6 +767,16 @@ if(ARM_DYNAREC)
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_66f0.c"
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_f20f.c"
     "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_f30f.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_0f.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_0f38.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_66_0f.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_f2_0f.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_f3_0f.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_66_0f38.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_66_0f3a.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_f2_0f38.c"
+    "${BOX64_ROOT}/src/dynarec/arm64/dynarec_arm64_avx_f2_0f3a.c"
     )
 endif()
 
@@ -823,6 +855,7 @@ if(LARCH64_DYNAREC)
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_0f.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_64.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_66.c"
+    "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_67.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_f30f.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_660f.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_f0.c"
@@ -1200,6 +1233,14 @@ add_test(lock ${CMAKE_COMMAND} -D TEST_PROGRAM=${CMAKE_BINARY_DIR}/${BOX64}
     -D TEST_ARGS=${CMAKE_SOURCE_DIR}/tests/test29 -D TEST_OUTPUT=tmpfile29.txt
     -D TEST_REFERENCE=${CMAKE_SOURCE_DIR}/tests/ref29.txt
     -P ${CMAKE_SOURCE_DIR}/runTest.cmake )
+
+add_test(avx_intrinsics ${CMAKE_COMMAND} -D TEST_PROGRAM=${CMAKE_BINARY_DIR}/${BOX64}
+    -D TEST_ARGS=${CMAKE_SOURCE_DIR}/tests/test30 -D TEST_OUTPUT=tmpfile30.txt
+    -D TEST_REFERENCE=${CMAKE_SOURCE_DIR}/tests/ref30.txt
+    -P ${CMAKE_SOURCE_DIR}/runTest.cmake )
+
+set_tests_properties(avx_intrinsics PROPERTIES ENVIRONMENT "BOX64_DYNAREC_FASTNAN=0;BOX64_DYNAREC_FASTROUND=0;BOX64_AVX=2")
+
 else()
 
 add_test(bootSyscall ${CMAKE_COMMAND} -D TEST_PROGRAM=${CMAKE_BINARY_DIR}/${BOX64}
@@ -1336,6 +1377,15 @@ add_test(lock ${CMAKE_COMMAND} -D TEST_PROGRAM=${CMAKE_BINARY_DIR}/${BOX64}
     -D TEST_ARGS=${CMAKE_SOURCE_DIR}/tests/test29_android -D TEST_OUTPUT=tmpfile29.txt
     -D TEST_REFERENCE=${CMAKE_SOURCE_DIR}/tests/ref29.txt
     -P ${CMAKE_SOURCE_DIR}/runTest.cmake )
+
+#add_test(avx_intrinsics ${CMAKE_COMMAND} -D TEST_PROGRAM=${CMAKE_BINARY_DIR}/${BOX64}
+#    -D TEST_ARGS=${CMAKE_SOURCE_DIR}/tests/test30_android -D TEST_OUTPUT=tmpfile30.txt
+#    -D TEST_REFERENCE=${CMAKE_SOURCE_DIR}/tests/ref30.txt
+#    -P ${CMAKE_SOURCE_DIR}/runTest.cmake )
+#
+#set_tests_properties(avx_intrinsics PROPERTIES ENVIRONMENT "BOX64_DYNAREC_FASTNAN=0;BOX64_DYNAREC_FASTROUND=0 BOX64_AVX=2")
+
+
 endif()
 
 if(NOT ANDROID)

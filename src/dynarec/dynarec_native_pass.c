@@ -49,6 +49,7 @@ uintptr_t native_pass(dynarec_native_t* dyn, uintptr_t addr, int alternate, int 
     dyn->forward_to = 0;
     dyn->forward_size = 0;
     dyn->forward_ninst = 0;
+    dyn->ymm_zero = 0;
     #if STEP == 0
     memset(&dyn->insts[ninst], 0, sizeof(instruction_native_t));
     #endif
@@ -108,6 +109,7 @@ uintptr_t native_pass(dynarec_native_t* dyn, uintptr_t addr, int alternate, int 
             dyn->last_ip = 0;   // reset IP if some jump are coming here
         #endif
         NEW_INST;
+        MESSAGE(LOG_DUMP, "New Instruction x64:%p, native:%p\n", (void*)addr, (void*)dyn->block);
         #if STEP == 0
         if(ninst && dyn->insts[ninst-1].x64.barrier_next) {
             BARRIER(dyn->insts[ninst-1].x64.barrier_next);
@@ -208,7 +210,9 @@ uintptr_t native_pass(dynarec_native_t* dyn, uintptr_t addr, int alternate, int 
                 reset_n = getNominalPred(dyn, ii);  // may get -1 if no predecessor are available
                 if(reset_n==-1) {
                     reset_n = -2;
-                    MESSAGE(LOG_DEBUG, "Warning, Reset Caches mark not found\n");
+                    if(!dyn->insts[ninst].x64.has_callret) {
+                        MESSAGE(LOG_DEBUG, "Warning, Reset Caches mark not found\n");
+                    }
                 }
             }
         }
@@ -304,6 +308,8 @@ uintptr_t native_pass(dynarec_native_t* dyn, uintptr_t addr, int alternate, int 
         }
         if((ok>0) && dyn->insts[ninst].x64.has_callret)
             reset_n = -2;
+        if((ok>0) && reset_n==-1 && dyn->insts[ninst+1].purge_ymm)
+            PURGE_YMM();
         ++ninst;
         #if STEP == 0
         memset(&dyn->insts[ninst], 0, sizeof(instruction_native_t));

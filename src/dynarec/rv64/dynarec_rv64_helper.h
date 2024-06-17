@@ -174,12 +174,7 @@
 #define GETSEW(i, D)                                                                           \
     if (MODREG) {                                                                              \
         wback = xRAX + (nextop & 7) + (rex.b << 3);                                            \
-        if (rv64_zbb)                                                                          \
-            SEXTH(i, wback);                                                                   \
-        else {                                                                                 \
-            SLLI(i, wback, 48);                                                                \
-            SRAI(i, i, 48);                                                                    \
-        }                                                                                      \
+        SEXTH(i, wback);                                                                       \
         ed = i;                                                                                \
         wb1 = 0;                                                                               \
     } else {                                                                                   \
@@ -549,6 +544,14 @@
     for (int i = 0; i < 2; ++i) {              \
         LWU(GX1, gback, gdoffset + i * 4);     \
         LWU(EX1, wback, fixedaddress + i * 4); \
+        F;                                     \
+        SW(GX1, gback, gdoffset + i * 4);      \
+    }
+
+#define MMX_LOOP_DS(GX1, EX1, F)               \
+    for (int i = 0; i < 2; ++i) {              \
+        LW(GX1, gback, gdoffset + i * 4);      \
+        LW(EX1, wback, fixedaddress + i * 4);  \
         F;                                     \
         SW(GX1, gback, gdoffset + i * 4);      \
     }
@@ -1338,7 +1341,7 @@ void emit_shrd32c(dynarec_rv64_t* dyn, int ninst, rex_t rex, int s1, int s2, uin
 void emit_shld32c(dynarec_rv64_t* dyn, int ninst, rex_t rex, int s1, int s2, uint32_t c, int s3, int s4);
 void emit_shrd32(dynarec_rv64_t* dyn, int ninst, rex_t rex, int s1, int s2, int s5, int s3, int s4, int s6);
 void emit_shld32(dynarec_rv64_t* dyn, int ninst, rex_t rex, int s1, int s2, int s5, int s3, int s4, int s6);
-void emit_shrd16c(dynarec_rv64_t* dyn, int ninst, rex_t rex, int s1, int s2, uint32_t c, int s3, int s4);
+void emit_shrd16c(dynarec_rv64_t* dyn, int ninst, rex_t rex, int s1, int s2, uint32_t c, int s3, int s4, int s5);
 void emit_shld16c(dynarec_rv64_t* dyn, int ninst, rex_t rex, int s1, int s2, uint32_t c, int s3, int s4, int s5);
 
 void emit_pf(dynarec_rv64_t* dyn, int ninst, int s1, int s3, int s4);
@@ -1665,6 +1668,8 @@ uintptr_t dynarec64_F30F(dynarec_rv64_t* dyn, uintptr_t addr, uintptr_t ip, int 
 
 #define FCOMIS(v1, v2, s1, s2, s3, s4, s5) FCOMI(S, v1, v2, s1, s2, s3, s4, s5)
 #define FCOMID(v1, v2, s1, s2, s3, s4, s5) FCOMI(D, v1, v2, s1, s2, s3, s4, s5)
+
+#define PURGE_YMM()    /* TODO */
 
 // reg = (reg < -32768) ? -32768 : ((reg > 32767) ? 32767 : reg)
 #define SAT16(reg, s)             \

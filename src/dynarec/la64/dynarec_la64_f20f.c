@@ -108,6 +108,7 @@ uintptr_t dynarec64_F20F(dynarec_la64_t* dyn, uintptr_t addr, uintptr_t ip, int 
             } else {
                 FTINTRZ_W_D(d1, q0);
                 MOVFR2GR_S(gd, d1);
+                ZEROUP(gd);
             }
             if (!rex.w) ZEROUP(gd);
             if (!box64_dynarec_fastround) {
@@ -138,6 +139,7 @@ uintptr_t dynarec64_F20F(dynarec_la64_t* dyn, uintptr_t addr, uintptr_t ip, int 
             } else {
                 FTINT_W_D(d1, q0);
                 MOVFR2GR_S(gd, d1);
+                ZEROUP(gd);
             }
             x87_restoreround(dyn, ninst, u8);
             if (!box64_dynarec_fastround) {
@@ -212,6 +214,19 @@ uintptr_t dynarec64_F20F(dynarec_la64_t* dyn, uintptr_t addr, uintptr_t ip, int 
             MARK;
             VEXTRINS_D(v0, d0, 0); // v0[63:0] = d0[63:0]
             break;
+        case 0x5D:
+            INST_NAME("MINSD Gx, Ex");
+            nextop = F8;
+            GETGX(v0, 1);
+            GETEXSD(v1, 0, 0);
+            FCMP_D(fcc0, v0, v1, cUN);
+            BCNEZ_MARK(fcc0);
+            FCMP_D(fcc1, v1, v0, cLE);
+            BCEQZ_MARK2(fcc1);
+            MARK;
+            VEXTRINS_D(v0, v1, 0);
+            MARK2;
+            break;
         case 0x5E:
             INST_NAME("DIVSD Gx, Ex");
             nextop = F8;
@@ -241,6 +256,14 @@ uintptr_t dynarec64_F20F(dynarec_la64_t* dyn, uintptr_t addr, uintptr_t ip, int 
             MARK;
             VEXTRINS_D(v0, v1, 0);
             MARK2;
+            break;
+        case 0x70:
+            INST_NAME("PSHUFLW Gx, Ex, Ib");
+            nextop = F8;
+            GETEX(v1, 0, 1);
+            GETGX(v0, 1);
+            u8 = F8;
+            VSHUF4I_H(v0, v1, u8);
             break;
         case 0xC2:
             INST_NAME("CMPSD Gx, Ex, Ib");

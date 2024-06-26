@@ -371,6 +371,7 @@
 #() vFiLL
 #() vFipi
 #() vFipu
+#() vFipL
 #() vFipp
 #() vFCCC
 #() vFWWW
@@ -1469,6 +1470,7 @@
 #() vFppupp
 #() vFppfff
 #() vFppddp
+#() vFppLLL
 #() vFppLpL
 #() vFpppii
 #() vFpppip
@@ -1477,6 +1479,7 @@
 #() vFpppup
 #() vFpppff
 #() vFpppdd
+#() vFpppLp
 #() vFppppi
 #() vFppppu
 #() vFppppL
@@ -1622,6 +1625,7 @@
 #() iFpppup
 #() iFpppUi
 #() iFpppLi
+#() iFpppLL
 #() iFpppLp
 #() iFppppi
 #() iFppppu
@@ -1692,6 +1696,7 @@
 #() pFEpipA
 #() pFEpupp
 #() pFEpUpp
+#() pFEpLpp
 #() pFEppii
 #() pFEppip
 #() pFEppLp
@@ -2122,6 +2127,7 @@
 #() LFpLippp
 #() LFpLLLLL
 #() LFppLLpL
+#() LFppLpLL
 #() LFSpLiip
 #() pFEpiupp
 #() pFEpippp
@@ -2325,6 +2331,7 @@
 #() iFiiiiiip
 #() iFipupupi
 #() iFippuIup
+#() iFipppppp
 #() iFpiiiiii
 #() iFpiiiuwp
 #() iFpiiiuup
@@ -2545,6 +2552,7 @@
 #() vFppuppiiu
 #() vFpplppppi
 #() vFpplppppp
+#() vFppLpLpLp
 #() vFpppipppu
 #() vFpppuiiii
 #() vFppppiipi
@@ -3591,6 +3599,8 @@ wrappedglib2:
   - g_error_new_valist
 - pFpupp:
   - g_datalist_id_dup_data
+- pFpLpp:
+  - g_bytes_new_with_free_func
 - pFppip:
   - g_thread_create
 - pFpppp:
@@ -4632,6 +4642,7 @@ wrappedlibpthread:
   - pthread_barrierattr_init
   - pthread_cond_broadcast
   - pthread_cond_destroy
+  - pthread_cond_signal
   - pthread_condattr_destroy
   - pthread_condattr_init
   - pthread_getattr_default_np

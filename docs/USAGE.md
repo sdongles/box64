@@ -151,6 +151,7 @@ Dynarec will compare it's execution with the interpreter (super slow, only for t
  * 0 : No comparison. (Default.)
  * 1 : Each opcode runs on interepter and on Dynarec, and regs and memory are compared and print if different.
  * 2 : Thread-safe tests, extremely slow.
+ * 0xXXXXXXXX-0xYYYYYYYY : define the interval where dynarec is tested (inclusive-exclusive)
 
 #### BOX64_DYNAREC_BIGBLOCK *
 Enables/Disables Box64's Dynarec building BigBlock.
@@ -335,7 +336,7 @@ Define x86_64 bash to launch script
  * XXX=yyyy
  will add XXX=yyyy env. var. and continue with BOX86_ENV2 ... until var doesn't exist
 
-#### BOX64_RESERVE_HIGH
+#### BOX64_RESERVE_HIGH *
 * 0 : Don't try to pe-reserve high memory (beyond 47bits) (Default)
 * 1 : Try to reserve (without allocating it) memory beyond 47bits (seems unstable)
 

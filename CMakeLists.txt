@@ -209,9 +209,7 @@ elseif(ARM64)
     #add_definitions(-pipe -march=native)
     set(CMAKE_ASM_FLAGS  "-pipe -march=armv8-a+simd")
 elseif(ARM_DYNAREC)
-    if(NOT ANDROID)
-        set(CMAKE_ASM_FLAGS  "-pipe -march=armv8-a+crc+simd+crypto")
-    endif()
+    set(CMAKE_ASM_FLAGS  "-pipe -march=armv8-a+crc+simd+crypto")
 endif()
 if(ANDROID)
     add_definitions(-DANDROID)
@@ -855,6 +853,7 @@ if(LARCH64_DYNAREC)
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_0f.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_64.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_66.c"
+    "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_6664.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_67.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_f30f.c"
     "${BOX64_ROOT}/src/dynarec/la64/dynarec_la64_660f.c"

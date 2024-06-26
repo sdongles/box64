@@ -758,7 +758,34 @@ uintptr_t dynarec64_66(dynarec_arm_t* dyn, uintptr_t addr, uintptr_t ip, int nin
             STRH_U12(xRAX, x1, 0);
             SMWRITELOCK(lock);
             break;
-
+        case 0xA4:
+            SMREAD();
+            if(rep) {
+                INST_NAME("REP MOVSB");
+                CBZx_NEXT(xRCX);
+                TBNZ_MARK2(xFlags, F_DF);
+                MARK;   // Part with DF==0
+                LDRB_S9_postindex(x1, xRSI, 1);
+                STRB_S9_postindex(x1, xRDI, 1);
+                SUBx_U12(xRCX, xRCX, 1);
+                CBNZx_MARK(xRCX);
+                B_NEXT_nocond;
+                MARK2;  // Part with DF==1
+                LDRB_S9_postindex(x1, xRSI, -1);
+                STRB_S9_postindex(x1, xRDI, -1);
+                SUBx_U12(xRCX, xRCX, 1);
+                CBNZx_MARK2(xRCX);
+                // done
+            } else {
+                INST_NAME("MOVSB");
+                GETDIR(x3, 1);
+                LDRB_U12(x1, xRSI, 0);
+                STRB_U12(x1, xRDI, 0);
+                ADDx_REG(xRSI, xRSI, x3);
+                ADDx_REG(xRDI, xRDI, x3);
+            }
+            SMWRITE();
+            break;
         case 0xA5:
             SMREAD();
             if(rep) {
@@ -952,7 +979,7 @@ uintptr_t dynarec64_66(dynarec_arm_t* dyn, uintptr_t addr, uintptr_t ip, int nin
                     if (u8) {
                         SETFLAGS(X_CF | X_OF, SF_SUBSET_PENDING);
                         GETEW(x1, 1);
-                        u8 = F8;
+                        u8 = (F8)&0x1f;
                         emit_rol16c(dyn, ninst, x1, u8, x4, x5);
                         EWBACK;
                     } else {
@@ -965,7 +992,7 @@ uintptr_t dynarec64_66(dynarec_arm_t* dyn, uintptr_t addr, uintptr_t ip, int nin
                     if (geted_ib(dyn, addr, ninst, nextop) & 15) {
                         SETFLAGS(X_CF | X_OF, SF_SUBSET_PENDING);
                         GETEW(x1, 1);
-                        u8 = F8;
+                        u8 = (F8)&0x1f;
                         emit_ror16c(dyn, ninst, x1, u8, x4, x5);
                         EWBACK;
                     } else {
